@@ -8,20 +8,16 @@
     html, body {
       margin: 0;
       padding: 0;
-      background-color: #111;
-      color: white;
-      font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
       text-align: center;
-      overflow-x: hidden;
     }
 
-    #treeCanvas {
+    canvas {
       display: block;
       margin: 0 auto;
       background-color: #111;
-      width: 100%;
-      max-width: 400px;
-      height: 400px;
     }
 
     #verification-result {
@@ -35,37 +31,41 @@
   <div id="verification-result">Verifying authenticity...</div>
 
   <script>
-    // 🌱 Canvas Tree Growing Animation
-    const canvas = document.getElementById("treeCanvas");
-    const ctx = canvas.getContext("2d");
+    const canvas = document.getElementById('treeCanvas');
+    const ctx = canvas.getContext('2d');
 
-    function drawBranch(x, y, length, angle, depth) {
+    function drawTree(startX, startY, length, angle, depth, branchWidth) {
       if (depth === 0) return;
-      const xEnd = x + length * Math.cos(angle);
-      const yEnd = y - length * Math.sin(angle);
 
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(xEnd, yEnd);
-      ctx.strokeStyle = `hsl(${depth * 25}, 70%, 60%)`;
-      ctx.lineWidth = depth;
+      ctx.moveTo(startX, startY);
+
+      const endX = startX + length * Math.cos(angle);
+      const endY = startY - length * Math.sin(angle);
+
+      ctx.lineTo(endX, endY);
+      ctx.strokeStyle = `hsl(${depth * 30}, 70%, 60%)`;
+      ctx.lineWidth = branchWidth;
+      ctx.lineCap = 'round';
       ctx.stroke();
 
       setTimeout(() => {
-        drawBranch(xEnd, yEnd, length * 0.7, angle - 0.3, depth - 1);
-        drawBranch(xEnd, yEnd, length * 0.7, angle + 0.3, depth - 1);
+        drawTree(endX, endY, length * 0.7, angle - 0.4, depth - 1, branchWidth * 0.7);
+        drawTree(endX, endY, length * 0.7, angle + 0.4, depth - 1, branchWidth * 0.7);
       }, 100);
     }
 
     function animateTree() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawBranch(canvas.width / 2, canvas.height, 60, -Math.PI / 2, 8);
-      setTimeout(animateTree, 6000); // loop after full growth
+      drawTree(canvas.width / 2, canvas.height, 60, Math.PI / 2, 9, 10);
     }
 
-    window.addEventListener('load', animateTree);
+    window.addEventListener('load', () => {
+      animateTree();
+      setInterval(animateTree, 7000); // Loop every 7 seconds
+    });
 
-    // ✅ Code Verification
+    // Verification Logic
     const params = new URLSearchParams(window.location.search);
     const code = params.get('id')?.toUpperCase();
     const resultBox = document.getElementById("verification-result");
@@ -80,8 +80,6 @@
 
       try {
         const response = await fetch(`${endpoint}?code=${code}`);
-        if (!response.ok) throw new Error("Non-200 response");
-
         const result = await response.json();
 
         switch (result.status) {
@@ -98,8 +96,8 @@
             resultBox.innerText = `❌ Unexpected response: ${JSON.stringify(result)}`;
         }
       } catch (error) {
+        console.error("Verification error:", error);
         resultBox.innerText = "⚠️ Verification service unavailable.";
-        console.error("Error:", error);
       }
     }
 
