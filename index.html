@@ -3,25 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Verify Authenticity</title>
+  <title>Product Authentication</title>
   <style>
-    body {
-      font-family: sans-serif;
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #111;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      margin-top: 50px;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background-color: #111;
+    }
+    #verification-result {
+      margin-top: 20px;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <h1>Product Authenticity Checker</h1>
+  <canvas id="treeCanvas" width="400" height="400"></canvas>
   <div id="verification-result">Verifying authenticity...</div>
 
   <script>
+    // 🌱 Canvas Tree Growing Animation
+    const canvas = document.getElementById("treeCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let branches = [];
+    let angle = Math.PI / 4;
+    let depthLimit = 8;
+    let speed = 50; // ms per branch
+
+    function drawBranch(x, y, length, angle, depth) {
+      if (depth === 0) return;
+      const xEnd = x + length * Math.cos(angle);
+      const yEnd = y - length * Math.sin(angle);
+
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(xEnd, yEnd);
+      ctx.strokeStyle = `hsl(${depth * 20}, 70%, 60%)`;
+      ctx.lineWidth = depth;
+      ctx.stroke();
+
+      branches.push(() => drawBranch(xEnd, yEnd, length * 0.7, angle - 0.3, depth - 1));
+      branches.push(() => drawBranch(xEnd, yEnd, length * 0.7, angle + 0.3, depth - 1));
+    }
+
+    function animateTree() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      branches = [];
+      drawBranch(canvas.width / 2, canvas.height, 60, -Math.PI / 2, depthLimit);
+
+      let index = 0;
+      const interval = setInterval(() => {
+        if (index < branches.length) {
+          branches[index++]();
+        } else {
+          clearInterval(interval);
+          setTimeout(animateTree, 1000); // Loop after short pause
+        }
+      }, speed);
+    }
+
+    animateTree();
+
+    // ✅ Code Verification
     const params = new URLSearchParams(window.location.search);
     const code = params.get('id')?.toUpperCase();
-    const endpoint = "https://script.google.com/macros/s/AKfycbwYqlcUrGfMAqQB3KPPR5ePzsFeNXECvDieIeCDbzLyaz2RVv9HLKqF7YJwvbeGCN4/exec";
-
     const resultBox = document.getElementById("verification-result");
+
+    const endpoint = "https://script.google.com/macros/s/AKfycbwYqlcUrGfMAqQB3KPPR5ePzsFeNXECvDieIeCDbzLyaz2RVv9HLKqF7YJwvbeGCN4/exec";
 
     async function verifyCode() {
       if (!code) {
@@ -31,24 +87,26 @@
 
       try {
         const response = await fetch(`${endpoint}?code=${code}`);
+        if (!response.ok) throw new Error("Non-200 response");
+
         const result = await response.json();
 
         switch (result.status) {
           case "valid":
-            resultBox.innerText = "✅ This product is authentic and the code has been verified.";
+            resultBox.innerText = "✅ This product is authentic.";
             break;
           case "used":
-            resultBox.innerText = "⚠️ This code has already been used.";
+            resultBox.innerText = "⚠️ Code already used. But this product is authentic.";
             break;
           case "invalid":
             resultBox.innerText = "❌ Invalid code.";
             break;
           default:
-            resultBox.innerText = "❌ Unexpected error.";
+            resultBox.innerText = `❌ Unexpected response: ${JSON.stringify(result)}`;
         }
-      } catch (e) {
-        console.error("Verification failed:", e);
+      } catch (error) {
         resultBox.innerText = "⚠️ Verification service unavailable.";
+        console.error("Error:", error);
       }
     }
 
