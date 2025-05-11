@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Authenticity</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Product Authenticity Checker</h1>
+  <div id="verification-result">Verifying authenticity...</div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('id')?.toUpperCase();
+    const endpoint = "https://script.google.com/macros/s/AKfycbwYqlcUrGfMAqQB3KPPR5ePzsFeNXECvDieIeCDbzLyaz2RVv9HLKqF7YJwvbeGCN4/exec";
+
+    const resultBox = document.getElementById("verification-result");
+
+    async function verifyCode() {
+      if (!code) {
+        resultBox.innerText = "❌ No code provided.";
+        return;
+      }
+
+      try {
+        const response = await fetch(`${endpoint}?code=${code}`);
+        const result = await response.json();
+
+        switch (result.status) {
+          case "valid":
+            resultBox.innerText = "✅ This product is authentic and the code has been verified.";
+            break;
+          case "used":
+            resultBox.innerText = "⚠️ This code has already been used.";
+            break;
+          case "invalid":
+            resultBox.innerText = "❌ Invalid code.";
+            break;
+          default:
+            resultBox.innerText = "❌ Unexpected error.";
+        }
+      } catch (e) {
+        console.error("Verification failed:", e);
+        resultBox.innerText = "⚠️ Verification service unavailable.";
+      }
+    }
+
+    verifyCode();
+  </script>
+</body>
+</html>
