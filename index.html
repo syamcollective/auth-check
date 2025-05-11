@@ -12,12 +12,18 @@
       color: white;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
+      overflow-x: hidden;
     }
-    canvas {
+
+    #treeCanvas {
       display: block;
       margin: 0 auto;
       background-color: #111;
+      width: 100%;
+      max-width: 400px;
+      height: 400px;
     }
+
     #verification-result {
       margin-top: 20px;
       font-size: 1.2rem;
@@ -33,11 +39,6 @@
     const canvas = document.getElementById("treeCanvas");
     const ctx = canvas.getContext("2d");
 
-    let branches = [];
-    let angle = Math.PI / 4;
-    let depthLimit = 8;
-    let speed = 50; // ms per branch
-
     function drawBranch(x, y, length, angle, depth) {
       if (depth === 0) return;
       const xEnd = x + length * Math.cos(angle);
@@ -46,31 +47,23 @@
       ctx.beginPath();
       ctx.moveTo(x, y);
       ctx.lineTo(xEnd, yEnd);
-      ctx.strokeStyle = `hsl(${depth * 20}, 70%, 60%)`;
+      ctx.strokeStyle = `hsl(${depth * 25}, 70%, 60%)`;
       ctx.lineWidth = depth;
       ctx.stroke();
 
-      branches.push(() => drawBranch(xEnd, yEnd, length * 0.7, angle - 0.3, depth - 1));
-      branches.push(() => drawBranch(xEnd, yEnd, length * 0.7, angle + 0.3, depth - 1));
+      setTimeout(() => {
+        drawBranch(xEnd, yEnd, length * 0.7, angle - 0.3, depth - 1);
+        drawBranch(xEnd, yEnd, length * 0.7, angle + 0.3, depth - 1);
+      }, 100);
     }
 
     function animateTree() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      branches = [];
-      drawBranch(canvas.width / 2, canvas.height, 60, -Math.PI / 2, depthLimit);
-
-      let index = 0;
-      const interval = setInterval(() => {
-        if (index < branches.length) {
-          branches[index++]();
-        } else {
-          clearInterval(interval);
-          setTimeout(animateTree, 1000); // Loop after short pause
-        }
-      }, speed);
+      drawBranch(canvas.width / 2, canvas.height, 60, -Math.PI / 2, 8);
+      setTimeout(animateTree, 6000); // loop after full growth
     }
 
-    animateTree();
+    window.addEventListener('load', animateTree);
 
     // ✅ Code Verification
     const params = new URLSearchParams(window.location.search);
