@@ -13,33 +13,25 @@
       font-family: sans-serif;
       text-align: center;
     }
-
-    header {
-      margin-top: 20px;
-    }
-
+    header { margin-top: 20px; }
     .logo {
       width: 160px;
       height: auto;
       cursor: pointer;
     }
-
     canvas {
       display: block;
       margin: 20px auto 0 auto;
       background-color: #111;
     }
-
     #verification-result {
       margin-top: 20px;
       font-size: 1.2rem;
     }
-
     footer {
       margin-top: 40px;
       font-size: 0.9rem;
     }
-
     footer a {
       color: #4CAF50;
       text-decoration: none;
@@ -71,19 +63,15 @@
 
     function drawTree(startX, startY, length, angle, depth, branchWidth) {
       if (depth === 0) return;
-
       ctx.beginPath();
       ctx.moveTo(startX, startY);
-
       const endX = startX + length * Math.cos(angle);
       const endY = startY - length * Math.sin(angle);
-
       ctx.lineTo(endX, endY);
       ctx.strokeStyle = `hsl(${depth * 30}, 70%, 60%)`;
       ctx.lineWidth = branchWidth;
       ctx.lineCap = 'round';
       ctx.stroke();
-
       setTimeout(() => {
         drawTree(endX, endY, length * 0.7, angle - 0.4, depth - 1, branchWidth * 0.7);
         drawTree(endX, endY, length * 0.7, angle + 0.4, depth - 1, branchWidth * 0.7);
@@ -109,7 +97,8 @@
     const code = params.get('id')?.toUpperCase();
     const resultBox = document.getElementById("verification-result");
 
-    const endpoint = "https://auth.syam.co";
+    // This must point to your Cloudflare Worker route for verification
+    const endpoint = "https://auth.syam.co/api/verify";
 
     async function verifyCode() {
       if (!code) {
@@ -119,7 +108,7 @@
       }
 
       try {
-        const response = await fetch(`${endpoint}?code=${code}`);
+        const response = await fetch(`${endpoint}?id=${code}`);
         const result = await response.json();
 
         switch (result.status) {
