@@ -109,7 +109,7 @@
     const code = params.get('id')?.toUpperCase();
     const resultBox = document.getElementById("verification-result");
 
-    const endpoint = "https://script.google.com/macros/s/AKfycbwYqlcUrGfMAqQB3KPPR5ePzsFeNXECvDieIeCDbzLyaz2RVv9HLKqF7YJwvbeGCN4/exec";
+    const endpoint = "https://auth.syam.co/api";
 
     async function verifyCode() {
       if (!code) {
