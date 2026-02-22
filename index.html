@@ -49,7 +49,7 @@
 
   <!-- Main content -->
   <canvas id="treeCanvas" width="400" height="400"></canvas>
-  <div id="verification-result">Verifying authenticity...</div>
+  <div id="verification-result">Verifying Authenticity...</div>
 
   <!-- Footer link -->
   <footer>
@@ -97,7 +97,7 @@
     const code = params.get('id')?.toUpperCase();
     const resultBox = document.getElementById("verification-result");
 
-    // This must point to your Cloudflare Worker route for verification
+    //pointing to my CF worker
     const endpoint = "https://auth.syam.co/api/verify";
 
     async function verifyCode() {
@@ -117,7 +117,7 @@
             startTreeAnimation();
             break;
           case "used":
-            resultBox.innerText = "✅ Code already used, however, your product is authentic. A tree will be planted to sequester carbon from the atmosphere";
+            resultBox.innerText = "✅ Code already used, however, your product is authentic. A tree will be planted to sequester carbon from the atmosphere.";
             startTreeAnimation();
             break;
           case "invalid":
