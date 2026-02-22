@@ -113,15 +113,15 @@
 
         switch (result.status) {
           case "valid":
-            resultBox.innerText = "✅ Thank you for verifying your original product. Authenticity confirmed. A tree will be planted, purifying the air, removing carbon from the atmosphere and boosting climate resilience.";
+            resultBox.innerText = "✅ Thank you for verifying your original product. Authenticity confirmed. A tree will be planted to purify the air and actively sequestrate carbon.";
             startTreeAnimation();
             break;
           case "used":
-            resultBox.innerText = "✅ Code already used, your product is authentic, A tree will be planted, purifying the air, removing carbon from the atmosphere and boosting climate resilience";
+            resultBox.innerText = "✅ Code already used, however, your product is authentic, A tree will be planted, purifying the air, removing carbon from the atmosphere and boosting climate resilience";
             startTreeAnimation();
             break;
           case "invalid":
-            resultBox.innerText = "❌ Invalid code. Product is not authentic.";
+            resultBox.innerText = "❌ Invalid code. This product is not authentic.";
             stopTreeAnimation();
             break;
           default:
